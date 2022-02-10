@@ -21,5 +21,6 @@ __all__ = [
                 "menu_objs",
                 "Xyz",
                 "callbacks",
-                "debug_manager"
+                "debug_manager",
+                "colors_manager"
            ]

@@ -7,6 +7,7 @@ except:
     import coroutines_threads as coroutines
     import Xy as Xy_
 
+import math
 import pygame as pyg
 import sys
 from threading import Timer,Lock
@@ -43,6 +44,8 @@ class gameManager(base_classes.baseManager):
         self.handlers = default_input_handler
         self.scene = default_scene
         self.fps = default_fps
+        self.actual_fps = default_fps
+        self.past_fps = []
         self.scene_change_handlers = default_scene_change
         self.changeValues(fps,scenes,current_scene,user_input_handler,scene_change_func,bg_color)
         self.clock = pyg.time.Clock()
@@ -82,6 +85,12 @@ class gameManager(base_classes.baseManager):
             #print(os.getpid(),self.Managed)
             self.doUpdate()
             self.delta_time = self.clock.tick(self.fps) if self.fps != -1 else self.clock.tick()
+            self.past_fps.append(round(1/(self.delta_time/1000)))
+            if len(self.past_fps) > (self.actual_fps)*2.5:
+                self.past_fps.pop(0)
+            i = 0
+            for fps in self.past_fps: i+= fps
+            self.actual_fps = round(i/len(self.past_fps))
 
     def doUpdate(self):
         self.earlyUpdate()

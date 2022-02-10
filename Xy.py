@@ -8,8 +8,8 @@ import math
 class Xy(base_classes.baseStruct):
     
     def toBearing(self):
-        import Compass_gflint
-        Bearing = Compass_gflint.Bearing
+        import Compass
+        Bearing = Compass.Bearing
         
         if self.x == 0 and self.y >= 0:
             bearing = Bearing("N")
