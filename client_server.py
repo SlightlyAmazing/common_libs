@@ -13,10 +13,10 @@ import asyncio
 
 logManager = logger.logManager()
 
-def echoHandler(data):
+def echoHandler(id,data):
     return data
 
-def echoJoinHandler():
+def echoJoinHandler(*args):
     pass
 
 default_end_key = "!!end!!"

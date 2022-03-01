@@ -11,6 +11,7 @@ import math
 import pygame as pyg
 import sys
 from threading import Timer,Lock
+from time import sleep
 
 import os
 
@@ -70,6 +71,7 @@ class gameManager(base_classes.baseManager):
             self.changeScene(current_scene)
         
     def changeScene(self,new_scene):
+        sleep(0.25)
         self.scene = new_scene
         if self.scene in self.scene_change_handlers:
             for func in self.scene_change_handlers[self.scene]:

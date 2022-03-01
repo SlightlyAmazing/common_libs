@@ -20,8 +20,27 @@ class Xy(base_classes.baseStruct):
         return bearing
 
     def getNormalised(self):
+        if self == Xy(0):
+            return Xy(0)
         magnitude = math.sqrt(self.x**2+self.y**2)
-        return Xy(self.x/magnitude,self.y/magnitude) 
+        return Xy(self.x/magnitude,self.y/magnitude)
+    
+    def getSingleDirection(self):
+        if abs(self.x) > abs(self.y):
+            xy = Xy(self.x,0)
+        else:
+            xy = Xy(0,self.y)
+        return xy.getNormalised()
+
+    def cap(self,minXy,maxXy):
+        if self.x <minXy.x:
+            self.x = minXy.x
+        if self.y < minXy.y:
+            self.y = minXy.y
+        if self.x > maxXy.x:
+            self.x = maxXy.x
+        if self.y > maxXy.y:
+            self.y = maxXy.y
 
     def __init__(self, *formal, **keyword):
         self._set(0,0)
