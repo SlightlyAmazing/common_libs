@@ -2,16 +2,19 @@ try:
     from common_libs import json_reader
     from common_libs import base_classes
     from common_libs import logger
+    from common_libs import debug_manager
 except:
     import json_reader
     import base_classes
     import logger
+    import debug_manager
 
 from time import sleep
 import threading
 import asyncio
 
 logManager = logger.logManager()
+debugManager = debug_manager.debugManager(True)
 
 def echoHandler(id,data):
     return data
@@ -20,11 +23,9 @@ def echoJoinHandler(*args):
     pass
 
 default_end_key = "!!end!!"
-default_handlers = {"echoHandler":[echoHandler,2,echoJoinHandler],"noSpace":[None,1,None]}
+default_handlers = {"echoHandler":[echoHandler,2,echoJoinHandler],"noSpace":[None,-1,None]}
 default_ip = 'localhost'
 default_port = 8888
-
-debug = True
 
 class serversideManager(base_classes.baseManager):
 
@@ -46,7 +47,7 @@ class serversideManager(base_classes.baseManager):
         self.end_key = end_key
         self.semaphores = {}
         for item in self.handlers:
-            if self.handlers[item][1] < 0 :
+            if self.handlers[item][1] > 0 :
                 self.semaphores[item] = threading.BoundedSemaphore(self.handlers[item][1])
             else:
                 self.semaphores[item] = threading.BoundedSemaphore(99)
@@ -56,7 +57,7 @@ class serversideManager(base_classes.baseManager):
         self.server = await asyncio.start_server(self.handlerJoin,self.ip,self.port)
         self.addr = self.server.sockets[0].getsockname()
         logManager.Current.logInfo(f'Serving on {self.addr}')
-        if debug:
+        if debugManager.Current:
             print(f'Serving on {self.addr}')
         async with self.server:
             await self.server.serve_forever()
@@ -75,7 +76,6 @@ class serversideManager(base_classes.baseManager):
                 await client_obj.start()
             finally:
                 self.semaphores[handler].release()
-
         else:
             with self.semaphores["noSpace"]:
                 await reader.readuntil(self.end_key.encode())
@@ -86,7 +86,7 @@ class serversideManager(base_classes.baseManager):
     def onExit(self):
         self.active = False
         logManager.Current.logInfo(f'Closed serving')
-        if debug:
+        if debugManager.Current:
             print(f'Closed Serving')
 
     def onDestroy(self):
@@ -109,13 +109,13 @@ class serversideClient(base_classes.baseObject):
         about = self.writer.get_extra_info('peername')
         self.writer.write((json_reader.encodeJson({self.id:"received"})+type(self).Manager.Current.end_key).encode())
         logManager.Current.logInfo("Conected to '"+ str(self.id) + "' on " + str(about))
-        if debug:
+        if debugManager.Current:
             print("Conected to '"+ str(self.id) + "' on " + str(about))
         while type(self).Manager.Current.active and self.active:
             await self.loop()
         self.writer.write((json_reader.encodeJson({"Exit":{"Message":self.exit_message}})+type(self).Manager.Current.end_key).encode())
         logManager.Current.logInfo("Lost conection to '"+ str(self.id) + "' on " + str(about)+". Message: "+self.exit_message)
-        if debug:
+        if debugManager.Current:
             print("Lost conection to '"+ str(self.id) + "' on " + str(about)+". Message: "+self.exit_message)
 
     async def loop(self):
