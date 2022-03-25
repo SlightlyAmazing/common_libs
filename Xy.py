@@ -22,8 +22,7 @@ class Xy(base_classes.baseStruct):
     def getNormalised(self):
         if self == Xy(0):
             return Xy(0)
-        magnitude = math.sqrt(self.x**2+self.y**2)
-        return Xy(self.x/magnitude,self.y/magnitude)
+        return Xy(self.x/self.getMagnitude(),self.y/self.getMagnitude())
     
     def getSingleDirection(self):
         if abs(self.x) > abs(self.y):
@@ -31,6 +30,9 @@ class Xy(base_classes.baseStruct):
         else:
             xy = Xy(0,self.y)
         return xy.getNormalised()
+
+    def getMagnitude(self):
+        return math.sqrt(self.x**2+self.y**2)
 
     def cap(self,minXy,maxXy):
         if self.x <minXy.x:
@@ -244,7 +246,10 @@ class Xy(base_classes.baseStruct):
         return Xy(self.x.__invert__(),self.y.__invert__())
 
     def __round__(self,ndigits=None):
-        return Xy(round(self.x,ndigits),round(self.y,ndigits))
+        xy = Xy(round(self.x,ndigits),round(self.y,ndigits))
+        if ndigits == None:
+            return xy.__trunc__()
+        return xy
     
     def __trunc__(self):
         return Xy(math.trunc(self.x),math.trunc(self.y))

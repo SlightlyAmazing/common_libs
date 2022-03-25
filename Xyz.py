@@ -15,8 +15,10 @@ class Xyz(base_classes.baseStruct):
         return Xy(self.x,self.y)
 
     def getNormalised(self):
-        magnitude = math.sqrt(self.x**2+self.y**2+self.z**2)
-        return Xyz(self)/magnitude
+        return Xyz(self)/self.getMagnitude()
+
+    def getMagnitude(self):
+        return math.sqrt(self.x**2+self.y**2+self.z**2)
         
     def __init__(self, *formal, **keyword):
         self._set(0,0,0)
