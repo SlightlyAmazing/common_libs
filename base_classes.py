@@ -15,38 +15,38 @@ class baseObject(baseClass):
         return self
 
     def init(self,*formargs,**keyargs):
-        self.active = False
+        self._active = False
         type(self).Manager().Current.registerObj(self)
         self.onInit(*formargs,**keyargs)
-        self.exiting = False
-        self.active = True
+        self._exiting = False
+        self._active = True
 
     def onInit(self,*formargs,**keyargs):
         pass
 
     def earlyUpdate(self):
-        if self.active:
+        if self._active:
             self.onEarlyUpdate()
 
     def onEarlyUpdate(self):
         pass
     
     def update(self):
-        if self.active:
+        if self._active:
             self.onUpdate()
 
     def onUpdate(self):
         pass
 
     def lateUpdate(self):
-        if self.active:
+        if self._active:
             self.onLateUpdate()
 
     def onLateUpdate(self):
         pass
 
     def slowUpdate(self):
-        if self.active:
+        if self._active:
             self.onSlowUpdate()
 
     def onSlowUpdate(self):
@@ -61,8 +61,8 @@ class baseObject(baseClass):
         Timer(Exit_Timer,self.destroy).start()
         
     def exit(self):
-        self.exiting = True
-        self.active = False
+        self._exiting = True
+        self._active = False
         self.onExit()
 
     def onExit(self):
@@ -95,12 +95,12 @@ class baseManager(baseClass):
         pass
 
     def init(self,*formargs,**keyargs):
-        self.active = False
-        self.Managed = []
-        self.managed_lock = Lock() 
+        self._active = False
+        self._Managed = []
+        self._managed_lock = Lock() 
         self.onInit(*formargs,**keyargs)
-        self.active = True
-        self.exiting = False
+        self._active = True
+        self._exiting = False
         
     def onInit(self,*formargs,**keyargs):
         pass
@@ -109,21 +109,21 @@ class baseManager(baseClass):
         pass
 
     def registerObj(self, obj):
-        if obj not in self.Managed:
-            with self.managed_lock:
-                self.Managed.append(obj)
+        if obj not in self._Managed:
+            with self._managed_lock:
+                self._Managed.append(obj)
 
     def unRegisterObj(self, obj):
-        if obj in self.Managed:
-            with self.managed_lock:
-                for index in range(0,len(self.Managed)):
-                    if self.Managed[index] == obj:
-                        self.Managed.pop(index)
+        if obj in self._Managed:
+            with self._managed_lock:
+                for index in range(0,len(self._Managed)):
+                    if self._Managed[index] == obj:
+                        self._Managed.pop(index)
                         break
 
     def earlyUpdate(self):
-        if self.active:
-            for obj in self.Managed:
+        if self._active:
+            for obj in self._Managed:
                 obj.earlyUpdate()
             self.onEarlyUpdate()
 
@@ -131,8 +131,8 @@ class baseManager(baseClass):
         pass
 
     def update(self):
-        if self.active:
-            for obj in self.Managed:
+        if self._active:
+            for obj in self._Managed:
                 obj.update()
             self.onUpdate()
 
@@ -140,8 +140,8 @@ class baseManager(baseClass):
         pass
 
     def lateUpdate(self):
-        if self.active:
-            for obj in self.Managed:
+        if self._active:
+            for obj in self._Managed:
                 obj.lateUpdate()
             self.onLateUpdate()
 
@@ -149,8 +149,8 @@ class baseManager(baseClass):
         pass
 
     def slowUpdate(self):
-        if self.active:
-            for obj in self.Managed:
+        if self._active:
+            for obj in self._Managed:
                 obj.slowUpdate()
             self.onSlowUpdate()
 
@@ -158,9 +158,9 @@ class baseManager(baseClass):
         pass
 
     def exit(self):
-        self.active = False
-        self.exiting = True
-        for obj in self.Managed:
+        self._active = False
+        self._exiting = True
+        for obj in self._Managed:
             obj.exit()
         self.onExit()
         Timer(Exit_Timer,self.destroy).start()
@@ -169,7 +169,7 @@ class baseManager(baseClass):
         pass
 
     def destroy(self):
-        for obj in self.Managed:
+        for obj in self._Managed:
             obj.destroy()
         self.onDestroy()
         type(self).Current = None

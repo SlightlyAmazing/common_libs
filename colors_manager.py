@@ -14,3 +14,4 @@ class colorManager(base_classes.baseManager):
     Black = (0,0,0)
     White = (255,255,255)
     Grey = (230,230,230) 
+    Orange = (245,160,0)

@@ -26,7 +26,7 @@ def defaultInputHandler(events):
 # ===== default values
 
 default_size = Xy(1920,1080)
-default_caption = "pygame interface gflint"
+default_caption = "pygame interface"
 default_very_small_font = pyg.font.Font(pyg.font.get_default_font(),11)
 default_small_font = pyg.font.Font(pyg.font.get_default_font(),20)
 default_font = pyg.font.Font(pyg.font.get_default_font(),30)

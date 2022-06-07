@@ -14,7 +14,7 @@ class threadManager(base_classes.baseManager):
         if len(tasks) != 0:
             threads = self.createThreads(*tasks)
         else:
-            threads = self.Managed
+            threads = self._Managed
         for thread in threads:
             thread.holdUntilDone()
 
@@ -32,7 +32,7 @@ class threadManager(base_classes.baseManager):
 
     def getThreads(self,ignore_args,*tasks):
         threads = []
-        for thread in self.Managed:
+        for thread in self._Managed:
             for task in tasks:
                 if thread.isAlive():
                     if thread.func == task[0] and (ignore_args or thread.args == task[1:]):
@@ -46,7 +46,7 @@ class threadManager(base_classes.baseManager):
         return threads
 
     def cleanThreads(self):
-        for thread in self.Managed:
+        for thread in self._Managed:
             thread.isAlive()
             
     def onExit(self):

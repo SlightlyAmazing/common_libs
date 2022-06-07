@@ -20,7 +20,7 @@ class settingsManager(base_classes.baseManager):
             setting(settin["name"],settin["value"],settin["values"])
 
     def getSetting(self,name):
-        for setting in self.Managed:
+        for setting in self._Managed:
             if setting.name == name:
                 return setting
 

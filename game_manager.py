@@ -82,11 +82,13 @@ class gameManager(base_classes.baseManager):
 
     def doGame(self):
         self.clock.tick()
-        while self.active:
+        while self._active:
             threadManager.Current.cleanThreads()
             #print(os.getpid(),self.Managed)
             self.doUpdate()
             self.delta_time = self.clock.tick(self.fps) if self.fps != -1 else self.clock.tick()
+            if self.delta_time == 0:
+                self.delta_time = 1
             self.past_fps.append(round(1/(self.delta_time/1000)))
             if len(self.past_fps) > (self.actual_fps)*2.5:
                 self.past_fps.pop(0)
@@ -101,6 +103,7 @@ class gameManager(base_classes.baseManager):
         self.slowUpdateTimer +=1
         if self.slowUpdateTimer > 10:
             self.slowUpdate()
+        #print(self.scene)
 
     def userInput(self,events):
         tasks = [[self.updateInput,events]]
