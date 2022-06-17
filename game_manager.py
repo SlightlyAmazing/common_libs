@@ -71,6 +71,7 @@ class gameManager(base_classes.baseManager):
             self.changeScene(current_scene)
         
     def changeScene(self,new_scene):
+        #print("hi "+new_scene)
         sleep(0.25)
         self.scene = new_scene
         if self.scene in self.scene_change_handlers:
@@ -78,6 +79,7 @@ class gameManager(base_classes.baseManager):
                 func()
 
     def start(self):
+        #print("start")
         self.doGame()
 
     def doGame(self):
@@ -104,6 +106,7 @@ class gameManager(base_classes.baseManager):
         if self.slowUpdateTimer > 10:
             self.slowUpdate()
         #print(self.scene)
+        #print(self._Managed)
 
     def userInput(self,events):
         tasks = [[self.updateInput,events]]

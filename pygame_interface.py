@@ -62,8 +62,7 @@ class pygameManager(base_classes.baseManager):
         self.offset = 0 
         pyg.display.flip()
         gameManager.Current.registerObj(self)
-        self.active = True
-        self.exiting = False
+        self._active = True
         gameManager.Current.start()
 
     def onEarlyUpdate(self):

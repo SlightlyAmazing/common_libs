@@ -12,8 +12,8 @@ class callbackManager(base_classes.baseManager):
         pass
 
     def call(self,Id):
-        with self.managed_lock:
-            for obj in self.Managed:
+        with self._managed_lock:
+            for obj in self._Managed:
                 if obj.Id == Id:
                     obj.call()
 

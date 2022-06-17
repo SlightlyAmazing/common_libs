@@ -96,11 +96,11 @@ class baseManager(baseClass):
 
     def init(self,*formargs,**keyargs):
         self._active = False
+        self._exiting = False
         self._Managed = []
         self._managed_lock = Lock() 
         self.onInit(*formargs,**keyargs)
         self._active = True
-        self._exiting = False
         
     def onInit(self,*formargs,**keyargs):
         pass
