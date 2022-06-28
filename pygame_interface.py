@@ -3,11 +3,15 @@ try:
     from common_libs import coroutines_threads
     from common_libs import base_classes
     from common_libs import Xy as Xy_
+    from common_libs import debug_manager
+    from common_libs import colors_manager
 except:
     import game_manager
     import coroutines_threads
     import base_classes
     import Xy as Xy_
+    import debug_manager
+    import colors_manager
 
 import pygame as pyg
 
@@ -16,6 +20,8 @@ import pygame as pyg
 pyg.font.init()
 gameManager = game_manager.gameManager()
 threadManager = coroutines_threads.threadManager()
+debugManager = debug_manager.debugManager()
+colorManager = colors_manager.colorManager()
 Xy = Xy_.Xy
 
 # ==== default functions
@@ -84,6 +90,12 @@ class pygameManager(base_classes.baseManager):
             print("scene too large for current screen")
         self.offset = (screen_size-scene_size)/2
         self.screen.blit(scene,self.offset)
+
+        if debugManager.Current:
+            self.screen.blit(self.very_small_font.render("FPS: "+str(gameManager.Current.actual_fps),True,colorManager.White),Xy(5)) # difference is 17 y
+            self.screen.blit(self.very_small_font.render("∆T: "+str(gameManager.Current.delta_time),True,colorManager.White),Xy(5,21))
+            self.screen.blit(self.very_small_font.render("Scene: "+str(gameManager.Current.scene),True,colorManager.White),Xy(5,38))
+        
         pyg.display.flip()   
 
     def onExit(self):

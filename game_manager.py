@@ -2,10 +2,12 @@ try:
     from common_libs import base_classes
     from common_libs import coroutines_threads as coroutines
     from common_libs import Xy as Xy_
+    from common_libs import debug_manager
 except:
     import base_classes
     import coroutines_threads as coroutines
     import Xy as Xy_
+    import debug_manager
 
 import math
 import pygame as pyg
@@ -16,6 +18,7 @@ from time import sleep
 import os
 
 threadManager = coroutines.threadManager()
+debugManager = debug_manager.debugManager()
 Xy = Xy_.Xy
 
 def defaultUserInput(events):
@@ -35,12 +38,7 @@ class gameManager(base_classes.baseManager):
 
     def onInit(self,fps = None,scenes = None,current_scene = None,user_input_handler = None,scene_change_func = None,bg_color = None):
         self.bg_color = default_bg_color
-        self.instructs = {}
-        self.instructs_pos = {}
-        self.inputs = {}
         self.delta_time = 0
-        self.instructs_lock = Lock()
-        self.inputs_lock = Lock()
         self.scenes = {}
         self.handlers = default_input_handler
         self.scene = default_scene
@@ -71,7 +69,6 @@ class gameManager(base_classes.baseManager):
             self.changeScene(current_scene)
         
     def changeScene(self,new_scene):
-        #print("hi "+new_scene)
         sleep(0.25)
         self.scene = new_scene
         if self.scene in self.scene_change_handlers:
@@ -79,7 +76,6 @@ class gameManager(base_classes.baseManager):
                 func()
 
     def start(self):
-        #print("start")
         self.doGame()
 
     def doGame(self):
@@ -109,7 +105,7 @@ class gameManager(base_classes.baseManager):
         #print(self._Managed)
 
     def userInput(self,events):
-        tasks = [[self.updateInput,events]]
+        tasks = [[self.input,events]]
         if self.scene in self.handlers:
             tasks.extend([([handler,events]) for handler in self.handlers[self.scene]])
         else:
@@ -117,44 +113,17 @@ class gameManager(base_classes.baseManager):
         #print(tasks)
         threadManager.Current.holdForTasks(*tasks)
 
-    def updateInput(self,events):
-        with self.inputs_lock:
-            if self.scene not in self.inputs.keys():
-                self.inputs.update({self.scene:{"Keys":[],"MouseClick":[]}})
-            for event in events:
-                if event.type == pyg.KEYDOWN:
-                    self.inputs[self.scene]["Keys"].append({"Key":event.key})
-                elif event.type == pyg.MOUSEBUTTONDOWN:
-                    self.inputs[self.scene]["MouseClick"].append({"Pos":Xy(event.pos),"Button":event.button})
-
-    def getInput(self,scene):
-        with self.inputs_lock:
-            return self.inputs.pop(scene,{"Keys":[{"Key":""}],"MouseClick":[{"Pos":"","Button":""}]})
-
-    def updateScene(self,scene,color,rect):
-        with self.instructs_lock:
-            if scene not in self.instructs.keys():
-                self.instructs.update({scene:{"Rects":[]}})
-                self.instructs_pos.update({scene:[]})
-            self.updateSceneUnSafe(scene,color,rect)
-            
-    def updateSceneUnSafe(self,scene,color,rect):
-        self.scenes[scene].fill(color,rect)
-        xy =Xy(rect.left,rect.top)
-        if xy not in self.instructs_pos[scene]:
-            self.instructs_pos[scene].append(xy)
-            self.instructs[scene]["Rects"].append({"Pos":xy,"Size":Xy(rect.width,rect.height),"Color":color})
-
-    def getInstructions(self,scene):
-        with self.instructs_lock:
-            self.instructs_pos.pop(scene,[])
-            return self.instructs.pop(scene,{"Rects":[{"Pos":Xy(0),"Size":Xy(0),"Color":(0,0,0)}]})
+    def input(self,events):
+        for event in events:
+            if event.type == pyg.KEYUP:
+                match event.key:
+                    case pyg.K_F3:
+                        debugManager.Current.cycle()
 
     def removeInputHandler(self,scene,handler):
-        with self.inputs_lock:
-            if scene in self.handlers:
-                if handler in self.handlers[scene]:
-                    self.handlers[scene].pop(self.handlers[scene].index(handler))
+        if scene in self.handlers:
+            if handler in self.handlers[scene]:
+                self.handlers[scene].pop(self.handlers[scene].index(handler))
 
     def onDestroy(self):
         sys.exit()
