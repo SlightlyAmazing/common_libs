@@ -18,7 +18,7 @@ class Xyz(base_classes.baseStruct):
         return Xyz(self)/self.getMagnitude()
 
     def getMagnitude(self):
-        return math.sqrt(self.x**2+self.y**2+self.z**2)
+        return math.sqrt(self.x**2 + self.y**2 + self.z**2)
         
     def __init__(self, *formal, **keyword):
         self._set(0,0,0)

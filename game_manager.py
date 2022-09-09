@@ -9,13 +9,9 @@ except:
     import Xy as Xy_
     import debug_manager
 
-import math
 import pygame as pyg
 import sys
-from threading import Timer,Lock
 from time import sleep
-
-import os
 
 threadManager = coroutines.threadManager()
 debugManager = debug_manager.debugManager()
@@ -82,27 +78,27 @@ class gameManager(base_classes.baseManager):
         self.clock.tick()
         while self._active:
             threadManager.Current.cleanThreads()
-            #print(os.getpid(),self.Managed)
             self.doUpdate()
             self.delta_time = self.clock.tick(self.fps) if self.fps != -1 else self.clock.tick()
-            if self.delta_time == 0:
-                self.delta_time = 1
-            self.past_fps.append(round(1/(self.delta_time/1000)))
-            if len(self.past_fps) > (self.actual_fps)*2.5:
-                self.past_fps.pop(0)
-            i = 0
-            for fps in self.past_fps: i+= fps
-            self.actual_fps = round(i/len(self.past_fps))
 
     def doUpdate(self):
         self.earlyUpdate()
         self.update()
         self.lateUpdate()
         self.slowUpdateTimer +=1
-        if self.slowUpdateTimer > 10:
+        if self.slowUpdateTimer > 12:
             self.slowUpdate()
-        #print(self.scene)
-        #print(self._Managed)
+        self.calcFPS()
+
+    def calcFPS(self):
+        if self.delta_time == 0:
+            return
+        self.past_fps.append(round(1000/self.delta_time))
+        if len(self.past_fps) > min(self.actual_fps*2.5,150):
+            self.past_fps.pop(0)
+        i = 0
+        for fps in self.past_fps: i+= fps
+        self.actual_fps = round(i/len(self.past_fps))
 
     def userInput(self,events):
         tasks = [[self.input,events]]
@@ -110,7 +106,6 @@ class gameManager(base_classes.baseManager):
             tasks.extend([([handler,events]) for handler in self.handlers[self.scene]])
         else:
             tasks.extend([([handler,events]) for handler in self.handlers["_default"]])
-        #print(tasks)
         threadManager.Current.holdForTasks(*tasks)
 
     def input(self,events):
