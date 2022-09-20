@@ -16,9 +16,9 @@ class baseObject(baseClass):
 
     def init(self,*formargs,**keyargs):
         self._active = False
+        self._exiting = False
         type(self).Manager().Current.registerObj(self)
         self.onInit(*formargs,**keyargs)
-        self._exiting = False
         self._active = True
 
     def onInit(self,*formargs,**keyargs):
@@ -52,9 +52,6 @@ class baseObject(baseClass):
     def onSlowUpdate(self):
         pass
 
-    def exitonlySelf(self): # here for compatibility; use 'exitOnlySelf()' instead
-        self.exitOnlySelf()
-
     def exitOnlySelf(self):
         self.exit()
         Thread(target=type(self).Manager.Current.unRegisterObj,args=(self,)).start()
@@ -76,7 +73,9 @@ class baseObject(baseClass):
     def onDestroy(self):
         pass
 
-    #must define a __hash__ method
+    def __hash__(self):
+        raise NotImplementedError("No Hash Method is defined for object: "+ repr(self))
+        #must define a __hash__ method
     
 class baseManager(baseClass):
 
@@ -182,4 +181,3 @@ class baseException(baseClass,Exception):
 
 class baseStruct(baseClass):
     pass
-    
